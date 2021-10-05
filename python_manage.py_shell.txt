@@ -1,0 +1,83 @@
+
+ To define a many-to-many relationship, use ManyToManyField.
+
+In this example, an Article can be published in multiple Publication objects, and a Publication has multiple Article objects:
+ ************************************************************************************
+ from core.models import Publication, Article
+>>> p1 = Publication(title='The python journal')
+>>> p1.save()
+>>> p2 = Publication(title='Science News')
+>>> p2.save()
+>>> p3 = Publication(title="Science Weekly')
+  File "<console>", line 1
+    p3 = Publication(title="Science Weekly')
+                                            ^
+SyntaxError: EOL while scanning string literal
+>>> p3 = Publication(title="Science Weekly")
+>>> p3.save()
+>>> a1 = Article(headline = 'Django lets you bouild Web apps easily')
+>>> a1.save()
+>>> a1.publications.add(p1)
+>>> a2 = Article(headline = 'NASA uses Python')
+>>> a2.save()
+>>> a2.publications.add(p2)
+>>> new_publications = a2.publications.create(title='Highlights for Children')
+>>> new_publications.save()
+
+*********Article objects have access to their related Publication objects:********
+
+>>> a1.publications.all()
+<QuerySet [<Publication: The python journal>]>
+>>> a2.publications.all()
+<QuerySet [<Publication: Science News>, <Publication: Highlights for Children>]>
+>>>
+>>> a2.publications.all()
+<QuerySet [<Publication: Science News>, <Publication: Highlights for Children>]>
+
+***********Publication objects have access to their related Article objects:*********
+
+>>> p2.article_set.all()
+<QuerySet [<Article: NASA uses Python>]>
+>>> p1.article_set.all()
+<QuerySet [<Article: Django lets you bouild Web apps easily>]>
+>>> Publication.objects.get(id=2).article_set.all()
+<QuerySet [<Article: NASA uses Python>]>
+
+*********Many-to-many relationships can be queried using lookups across relationships:******
+
+ Article.objects.filter(publications__id=1)
+<QuerySet [<Article: Django lets you bouild Web apps easily>]>
+>>> Article.objects.filter(publications__pk=1)
+<QuerySet [<Article: Django lets you bouild Web apps easily>]>
+>>> Article.objects.filter(publications=1)
+<QuerySet [<Article: Django lets you bouild Web apps easily>]>
+>>> Article.objects.filter(publications=p1)
+<QuerySet [<Article: Django lets you bouild Web apps easily>]>
+>>> Article.objects.filter(publications__title__startswith="Science")
+<QuerySet [<Article: NASA uses Python>]>
+
+********If we delete a Publication, its Articles won’t be able to access it:********
+
+>>> p1.delete()
+(2, {'core.Article_publications': 1, 'core.Publication': 1})
+>>> Publication.objects.all()
+<QuerySet [<Publication: Science News>, <Publication: Science Weekly>, <Publication: Highlights for Children>]>
+>>> a1 = Article.objects.get(pk=1)
+>>> a1.publications.all()
+<QuerySet []>
+
+**********If we delete an Article, its Publications won’t be able to access it:********
+
+>>> a2.delete()
+(3, {'core.Article_publications': 2, 'core.Article': 1})
+>>> Article.objects.all()
+<QuerySet [<Article: Django lets you bouild Web apps easily>]>
+>>> p2.article_set.all()
+<QuerySet []>
+
+
+
+
+
+
+
