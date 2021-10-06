@@ -1,0 +1,30 @@
+ from core.models import Reporter, Article
+>>> r = Reporter(first_name="John", last_name="Smith", email="john@example.com")
+>>> r.save()
+>>> r2 = Reporter(first_name='Paul', last_name='Jones', email='paul@example.com')
+>>> r2.save()
+>>> from datetime import date
+>>> a=Article(id=None, headline="This is a test", pub_date=date(2005, 7, 27), reporter=r)
+>>> a.save()
+>>> a.reporter.id
+1
+>>> a.reporter
+<Reporter: John Smith>
+
+**********Create an Article via the Reporter object:**********
+
+>>> new_article = r.article_set.create(headline="John's second story", pub_date=date(2005, 7, 29))
+>>> new_article
+<Article: Article object (2)>
+>>> new_article.headline
+"John's second story"
+>>> new_article.reporter
+<Reporter: John Smith>
+>>> new_article2 = Article.objects.create(headline="Paul's story", pub_date=date(2006, 1, 17), reporter=r)
+>>> new_article2.reporter
+<Reporter: John Smith>
+>>> r.article_set.all()
+<QuerySet [<Article: Article object (1)>, <Article: Article object (2)>, <Article: Article object (3)>]>
+>>> Article.objects.filter(reporter__pk=1)
+<QuerySet [<Article: Article object (1)>, <Article: Article object (2)>, <Article: Article object (3)>]>
+
