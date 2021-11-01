@@ -1,0 +1,261 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <meta charset="utf-8" />
+        <title>{% block title %}StudentBook{% endblock %}</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+        <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
+         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+        <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet" >
+    </head>
+    <body>
+    <div class="container">
+        <div class="row form-group" style="margin-top: 30px;">
+            <div class = 'col-lg-6'>
+                <button class="btn btn-block btn-success" id="insert_btn" data-toggle="modal" data-target="#insert_data">Insert</button>
+            </div>
+            <div class = 'col-lg-6'>
+                <button class="btn btn-block btn-secondary" id="update_btn">Edit all</button>
+                <button class="btn btn-block btn-secondary" id="save_all_btn" style="display:none; margin-top: 0px">Save All</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="alert alert-success" id="upt_success" style="display: none">
+
+                </div>
+                <div class="alert alert-danger" id="upt_error" style="display: none">
+
+                </div>
+            </div>
+        </div>
+
+       <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">ID</th>
+                  <th scope="col">Name</th>
+                  <th scope="col">Email</th>
+                  <th scope="col">Gender</th>
+                  <th scope="col">Created At</th>
+                </tr>
+              </thead>
+              <tbody>
+            {% for student in students %}
+                <tr>
+                  <th scope="row">{{ student.id }}</th>
+                  <td class="editable" data-type="name">{{ student.name }}</td>
+                  <td class="editable" data-type="email">{{ student.email }}</td>
+                  <td class="editable" data-type="gender">{{ student.gender }}</td>
+                  <td>{{ student.created_at }}</td>
+                  <td class="btn-td-block"><button class="btn btn-block btn-delete btn-danger">Delete</button></td>
+                </tr>
+             {% endfor %}
+              </tbody>
+        </table>
+    </div>
+    <div id="insert_data" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Insert Student</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Name : </label>
+                        <input type="text" name="name" id="ins_name" class="form-control" placeholder="Name">
+                    </div>
+                    <div class="form-group">
+                        <label>Email : </label>
+                        <input type="text" name="email" id="ins_email" class="form-control" placeholder="Email">
+                    </div>
+                    <div class="form-group">
+                        <label>Gender : </label>
+                        <select name="gender" class="form-control" id="ins_gender">
+                            <option>Male</option>
+                            <option>Female</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <input type="submit" name="submit" class="btn btn-block btn-info btn-insert-data" value="Insert Student">
+                    </div>
+                    <div class="form-group">
+                        <div class="alert alert-success" id="ins_success" style="display: none">
+
+                        </div>
+                        <div class="alert alert-danger" id="ins_error" style="display: none">
+
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(".btn-insert-data").click(function(){
+            var name = ($("#ins_name").val())
+            var email = ($("#ins_email").val())
+            var gender = ($("#ins_gender").val())
+            if (name==''){
+                $('#ins_error').text('Please Enter name')
+                $('#ins_error').show()
+                return;
+            }
+            else if (email ==''){
+                $('#ins_error').text('Please Enter email')
+                $('#ins_error').show()
+                return;
+            }
+            else{
+                $(".btn-insert-data").attr("disabled","disabled");
+                $(".btn-insert-data").text("Inserting... Please Wait..")
+                $.ajax({
+                    url: '{% url 'insert' %}',
+                    type:'POST',
+                    data:{name:name, email:email, gender:gender}
+                })
+                .done(function(response){ // response takes data from views student_data
+                    if(response['error'] == false){
+                        $('#ins_error').hide();
+                        $('#ins_success').text(response['errorMessage']);
+                        $('#ins_success').show();
+                        var html_data="<tr><td>" + response['id'] + "</td><td class='editable' data-type='name'>" + name + "</td><td class='editable' data-type='email'>" + email + "</td><td class='editable_select' data-type='gender'>" + gender + "</td></td class='editable' data-type='created_at'>" + response['created_at'] + "</td><td class='btn-td-block'><button class='btn btn-block btn-delete btn-danger'>Delete</button></td></tr>";
+                        $('.table').append(html_data);
+                    }
+                    else{
+                        $("#ins_success").hide();
+                        $("#ins_error").text(response['errorMessage'])
+                        $("#ins_error").show();
+                    }
+                })
+                .fail(function(){
+                    $("#ins_success").hide();
+                    $("#ins_error").text('Something went Wrong!');
+                    $("#ins_error").show();
+                })
+                .always(function(){
+                    $(".btn-insert-data").removeAttr("disabled")
+                    $(".btn-insert-data").text("INSERT STUDENT")
+                })
+            }
+        })
+
+        $("#update_btn").click(function(){
+            $("#update_btn").hide();
+            $("#save_all_btn").show();
+            $(".editable").each(function(){
+                var value = $(this).text();
+                var type = $(this).data('type');
+                if(type != 'gender'){
+                    var html_data="<input type='text' name='"+type+"' class='form-control input_"+type+" input_data' value='" +value+ "'>";
+                    $(this).html(html_data);
+                }
+                else {
+                    var html_data="<select name='"+type+"' class='form-control input_"+type+" input_data'>";
+                    if(value=="Male"){
+                        html_data+="<option selected>Male</option> <option>Female</option>";
+                    }
+                    else{
+                        html_data+="<option selected>Female</option> <option>Male</option>"
+                    }
+                    html_data+="</select>"
+                    $(this).html(html_data);
+                }
+            });
+        });
+        $("#save_all_btn").click(function(){
+            $("#save_all_btn").attr("disabled", "disabled");
+            $("save_all_btn").text("Saving Data...");
+            var json_data=[];
+            $(".input_data").each(function(){
+                console.log($(this).val())
+                var value = $(this).val();
+                var parent_html = $(this).parent();
+                parent_html.html(value);
+                $(this).remove();
+            })
+            $("tbody tr").each(function(){          <!-- accessing all tr td data and store into json object -->
+                var id=$(this).children().eq(0).text()
+                var name=$(this).children().eq(1).text()
+                var email=$(this).children().eq(2).text()
+                var gender=$(this).children().eq(3).text()
+                var single_data = {"id":id, "name":name, "email":email, "gender":gender};
+                json_data.push(single_data);
+            });
+            var string_data = JSON.stringify(json_data)
+             $.ajax({
+                    url: '{% url 'update_all' %}',
+                    type:'POST',
+                    data:{data: string_data}
+                })
+                .done(function(response){ // response takes data from views student_data
+                    if(response['error'] == false){
+                        $('#upt_error').hide();
+                        $('#upt_success').text(response['errorMessage']);
+                        $('#upt_success').show();
+                        var html_data="<tr><td>" + response['id'] + "</td><td class='editable' data-type='name'>" + name + "</td><td class='editable' data-type='email'>" + email + "</td><td class='editable_select' data-type='gender'>" + gender + "</td></td class='editable' data-type='created_at'>" + response['created_at'] + "</td><td class='btn-td-block'><button class='btn btn-block btn-delete btn-danger'>Delete</button></td></tr>";
+                        $('.table').append(html_data);
+                    }
+                    else{
+                        $("#upt_success").hide();
+                        $("#upt_error").text(response['errorMessage'])
+                        $("#upt_error").show();
+                    }
+                })
+                .fail(function(){
+                    $("#upt_success").hide();
+                    $("#upt_error").text('Something went Wrong!');
+                    $("#upt_error").show();
+                })
+                .always(function(){
+                    $("#save_all_btn").removeAttr("disabled");
+                    $("save_all_btn").text("SAVE ALL");
+                    $("#update_btn").show();
+                    $("#save_all_btn").hide();
+                })
+        });
+        $(document).on("click", ".btn-delete", function(){
+        <!--$(this).parents("tr").remove();-->
+            var this_html = $(this);
+            this_html.attr("disabled", "disabled");
+            this_html.text("DELETING...")
+            var id = this_html.parent().parent().children().first().text();
+            $.ajax({
+                    url: '{% url 'delete_data' %}',
+                    type:'POST',
+                    data:{id:id}
+                })
+                .done(function(response){ // response takes data from views student_data
+                    if(response['error'] == false){
+                        $('#upt_error').hide();
+                        $('#upt_success').text(response['errorMessage']);
+                        $('#upt_success').show();
+                        var html_data="<tr><td>" + response['id'] + "</td><td class='editable' data-type='name'>" + name + "</td><td class='editable' data-type='email'>" + email + "</td><td class='editable_select' data-type='gender'>" + gender + "</td></td class='editable' data-type='created_at'>" + response['created_at'] + "</td><td class='btn-td-block'><button class='btn btn-block btn-delete btn-danger'>Delete</button></td></tr>";
+                        $('.table').append(html_data);
+                    }
+                    else{
+                        $("#upt_success").hide();
+                        $("#upt_error").text(response['errorMessage'])
+                        $("#upt_error").show();
+                    }
+                })
+                .fail(function(){
+                    $("#upt_success").hide();
+                    $("#upt_error").text('Something went Wrong!');
+                    $("#upt_error").show();
+                })
+            })
+
+    </script>
+
+    </body>
+</html>
