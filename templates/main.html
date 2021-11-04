@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+<h4> Ajax = Asynchronous Javascript and XML</h4>
+<form id="form">
+    {% csrf_token %}
+    <p>
+        <label for="title"></label>
+        <input type="text" id="title">
+    </p>
+    <p>
+        <label for="description"></label>
+        <textarea required id="description" cols="30" rows="10"></textarea>
+    </p>
+    <p>
+        <button id="create-btn">Submit data</button>
+    </p>
+</form>
+<h3>All Articles</h3>
+<!--{% for article in allarticles %}-->
+<!-- <h2> {{ article.title }} <br/> </h2>-->
+<!-- <h3> {{ article.description }} <br/> </h3>-->
+<!--{% endfor %}-->
+<button id="load-article">Load Articles</button>
+<ul id="articles">
+
+</ul>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.24.0/axios.min.js" integrity="sha512-u9akINsQsAkG9xjc1cnGF4zw5TFDwkxuc9vUp5dltDWYCSmyd0meygbvgXrlc/z7/o4a19Fb5V0OUE58J7dcyw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+var loadBtn = document.getElementById("load-article");
+var articleContainer = document.getElementById("articles");
+loadBtn.addEventListener("click", function(){
+    axios.get("/all-articles/").then(function(resp){
+    articleContainer.innerHTML = resp.data
+    }).catch(function(err){
+        console.log(err)
+    })
+})
+
+var form = document.getElementById('form')
+form.addEventListener('submit', function(e){
+    e.preventDefault()
+    var fd = new FormData()
+    fd.append("title", document.getElementById('title').value)
+    fd.append('description', document.getElementById('description').value)
+    fd.append('csrfmiddlewaretoken', "{{csrf_token}}")
+    axios.post('/create-article/', fd)
+        .then(function(resp){
+            if(resp.data.status === "success") {
+                loadBtn.click()
+                form.reset()
+            }
+        })
+        .catch(function(err){
+            console.log(err)
+        })
+})
+</script>
+</body>
+</html>
