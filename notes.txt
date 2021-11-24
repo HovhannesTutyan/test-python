@@ -1,0 +1,10 @@
+
+AttributeError: module 'json' has no attribute 'loads'
+
+sys.path contains a list of locations to find in when searching for a module.
+Note that the current working directory is denoted by an empty string (”).
+
+According to the official document for sys.path, the first location in sys.path is the directory containing the script.
+As we were just testing in the interactive shell, there was no script directory.
+As a result, the first location in sys.path became an empty string, indicating that it will look for the modules in the current working directory first.
+#####################################################################################################################################################################
