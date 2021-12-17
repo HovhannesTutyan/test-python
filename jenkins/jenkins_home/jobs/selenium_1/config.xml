@@ -1,0 +1,41 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<project>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties/>
+  <scm class="hudson.scm.NullSCM"/>
+  <assignedNode>remote_client</assignedNode>
+  <canRoam>false</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>pytest --junitxml results.xml /home/remote_user/selenium/test_1.py </command>
+      <configuredLocalRules/>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers>
+    <hudson.tasks.ArtifactArchiver>
+      <artifacts>results.xml</artifacts>
+      <allowEmptyArchive>false</allowEmptyArchive>
+      <onlyIfSuccessful>false</onlyIfSuccessful>
+      <fingerprint>false</fingerprint>
+      <defaultExcludes>true</defaultExcludes>
+      <caseSensitive>true</caseSensitive>
+      <followSymlinks>false</followSymlinks>
+    </hudson.tasks.ArtifactArchiver>
+    <hudson.tasks.junit.JUnitResultArchiver plugin="junit@1.53">
+      <testResults>results.xml</testResults>
+      <keepLongStdio>false</keepLongStdio>
+      <healthScaleFactor>1.0</healthScaleFactor>
+      <allowEmptyResults>false</allowEmptyResults>
+      <skipPublishingChecks>false</skipPublishingChecks>
+      <checksName></checksName>
+      <skipMarkingBuildUnstable>false</skipMarkingBuildUnstable>
+    </hudson.tasks.junit.JUnitResultArchiver>
+  </publishers>
+  <buildWrappers/>
+</project>

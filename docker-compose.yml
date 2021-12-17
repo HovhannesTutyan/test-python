@@ -1,0 +1,31 @@
+version: '3'
+services: 
+  jenkins:
+    container_name: jenkins
+    image: jenkins
+    build:
+      context: jenkins
+    ports:
+      - "8080:8080"
+    volumes:
+      - "$PWD/jenkins/jenkins_home:/var/jenkins_home"
+      - "$PWD/remote-key:/var/jenkins_home/remote-key"
+    networks:
+      - net
+  remote_client:
+    container_name: remote_client
+    image: remote_client
+    build:
+      context: remote_client
+    volumes:
+      - "$PWD/remote-key.pub:/home/remote_user/.ssh/authorized_keys"
+      - "$PWD/remote_client/selenium:/home/remote_user/selenium"
+    networks:
+      - net
+  standalone_chrome:
+    image: selenium/standalone-chrome:latest
+    hostname: chrome
+    networks:
+      - net
+networks:
+  net:
