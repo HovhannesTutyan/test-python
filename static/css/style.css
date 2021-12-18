@@ -1,0 +1,19 @@
+.container-fluid{
+    margin-bottom:0;
+    padding: 0;
+}
+.row.g-3{
+    margin-top: 20px;
+}
+.nav-link.dropdown{
+    margin-top: 0;
+    padding: 0;
+}
+
+#content{
+    margin-top: 100px;
+}
+.btn.btn-outline-secondary{
+    margin-left: 10px;
+    margin-right: 10px;
+}

@@ -1,0 +1,7 @@
+1. To add session
+python manage.py shell
+from django.contrib.sessions.models import Session
+s = Session.objects.get(pk="8sd8z5cvipsv433ckob49j21hk5rxezd")
+s.get_decoded()
+{'_auth_user_id': '1', '_auth_user_backend': 'django.contrib.auth.backends.ModelBackend', '_auth_user_hash': '75a4c
+3426bd516e62e10e637fe51251f09d221f1c59c034b209d0275acfdfe67', 'skey': {'number': 123123}}
