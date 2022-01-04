@@ -24,19 +24,22 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarCollapse">
           <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="dropdown01" data-bs-toggle="dropdown" aria-expanded="false">Settings</a>
-          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <li><a class="dropdown-item" href="{% url 'store:all_products' %}">All</a></li>
-              {% for c in categories %}
-            <li><a class="dropdown-item" href="{{ c.get_absolute_url }}">{{ c.name | title }}</a></li>
-              {% endfor %}
-          </ul>
-        </li>
-        <form class="d-flex">
-          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-          <button class="btn btn-outline-success" type="submit">Search</button>
-        </form>
-
+              <a class="nav-link dropdown-toggle" href="#" id="dropdown01" data-bs-toggle="dropdown" aria-expanded="false">Settings</a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <li><a class="dropdown-item" href="{% url 'store:all_products' %}">All</a></li>
+                  {% for c in categories %}
+                <li><a class="dropdown-item" href="{{ c.get_absolute_url }}">{{ c.name | title }}</a></li>
+                  {% endfor %}
+              </ul>
+          </li>
+          <div class="container">
+              <div class="row p-3">
+                  <form action="{% url 'basket:basket_list' %}" method="GET" class="d-flex">
+                  <input name="keyword" class="form-control me-2" type="text" placeholder="Search..." aria-label="Search">
+                  <button class="btn btn-outline-success" type="submit">Search</button>
+                </form>
+              </div>
+          </div>
       </div>
         <a type="button" role="button" href="{% url 'basket:basket_summary' %}" class="btn btn-outline-secondary">
 

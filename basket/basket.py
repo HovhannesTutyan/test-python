@@ -39,3 +39,12 @@ class Basket():
         if product_id in self.basket:
             del self.basket[product_id]
             self.session.modified = True
+
+    def update(self, product, qty):
+        product_id = product
+        if product_id in self.basket:
+            self.basket[product_id]['qty'] = qty
+            self.session.modified = True
+
+
+
