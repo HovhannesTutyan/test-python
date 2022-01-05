@@ -1,0 +1,33 @@
+python manage.py shell
+
+from core.models import Article
+>>> from core.serializers import ArticleSerializer
+>>> from rest_framework.renderers import JSONRenderer
+>>> from rest_framework.parsers import JSONParser
+>>> a = Article(title="ArticleTitle", author="Parwiz", email="Parwiz@mail.com")
+>>> a.save()
+>>> a = Article(title="2ArticleTitle", author="2Parwiz", email="2Parwiz@mail.com")
+>>> a.save()
+>>> serializer = ArticleSerializer(a)
+>>> serializer.data
+{'title': '2ArticleTitle', 'author': '2Parwiz', 'email': '2Parwiz@mail.com', 'date': '2022-01-05T11:32:39.112283Z'}
+        To make a single data json
+>>> content = JSONRenderer().render(serializer.data)
+>>> content
+b'{"title":"2ArticleTitle","author":"2Parwiz","email":"2Parwiz@mail.com","date":"2022-01-05T11:32:39.112283Z"}'
+        To serialize many articles (queryset)
+>>> serializer = ArticleSerializer(Article.objects.all(), many=True)
+>>> serializer.data
+[OrderedDict([('title', 'ArticleTitle'), ('author', 'Parwiz'), ('email', 'Parwiz@mail.com'), ('date', '2022-01-05T1
+1:29:04.814497Z')]), OrderedDict([('title', '2ArticleTitle'), ('author', '2Parwiz'), ('email', '2Parwiz@mail.com'),
+ ('date', '2022-01-05T11:32:39.112283Z')])]
+        After creating class_serializers.py
+>>> serializer = ArticleSerializer()
+>>> print(repr(serializer))
+ArticleSerializer():
+    title = CharField(max_length=100)
+    author = CharField(max_length=100)
+    email = EmailField(max_length=100)
+    date = DateTimeField()
+
+
