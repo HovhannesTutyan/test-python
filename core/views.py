@@ -1,0 +1,41 @@
+from django.shortcuts import render, redirect
+from .models import *
+
+def gallery(request):
+    category = request.GET.get('category') # gets the category from url and gallery.html
+    print(category) # Pets, Persons
+    if category == None:
+        photos = Photo.objects.all()
+    else:
+        photos = Photo.objects.filter(category__name=category)
+
+    categories = Category.objects.all()
+    context= {'categories':categories, 'photos': photos}
+    return render(request, 'core/gallery.html', context)
+
+def viewPhoto(request, pk):
+    photo = Photo.objects.get(pk=pk)
+    context = {'photo':photo}
+    return render(request, 'core/photo.html', context)
+
+def addPhoto(request):
+    categories = Category.objects.all()
+    if request.method == 'POST':
+        data=request.POST
+        image = request.FILES.get('image')
+        print('data:' , data) # data: <QueryDict: {'csrfmiddlewaretoken': ['yhtIieg8wp6EhNvgdXOjSdWN9P8CMnJcuniMwZRwiylwmtR8WGULi3w7wqDSQFOU'], 'description': ['adsfadf'], 'category': ['1'], 'category_new': ['adfads']}>image: photo1.jpg
+        print('image:', image)
+        if data['category'] != 'none':
+            category = Category.objects.get(id=data['category'])
+        elif data['category'] != '':
+            category, created = Category.objects.get_or_create(name=data['category_new'])
+        else:
+            category = None
+        photo = Photo.objects.create(
+            category = category,
+            description = data['description'],
+            image=image,
+        )
+        return redirect('gallery')
+    context = {'categories':categories}
+    return render(request, 'core/add.html', context)
