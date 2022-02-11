@@ -1,20 +1,81 @@
-b = [65,41,27,77]
-for i in b:
-    print(i) #65 41 27 77
+# ForeignKey - generally known as a many-to-one relationship. Person >--| Birthplace
+                                                                ^            ^
+                                                                |            |
+                                                                Many        One 
 
-for i in range(0,len(b)):
-    print(i) # 0 1 2 3
+class Birthplace(models.Model):
+    city = models.CharField(max_length=75)
+    state = models.CharField(max_length=25)
 
-for i in range(0,3):
-    for j in range(0,4):
-        print(i,j)
+    def __unicode__(self):
+        return "".join(self.city, ", ", self.state)
 
-repeat = input("Enter a whole number:")
-repeat = int(repeat)
+class Person(models.Model):
+    name = models.CharField(max_length=50)
+    birthplace = models.ForeignKey(Birthplace)
 
-for i in range(repeat):
-    print(i) # 0 1 2 3
+    def __unicode__(self):
+        return self.name
+    
+>> from somewhere.models import Birthplace, Person
+>> Person.objects.all()
+[<Person: John Smith>, <Person: Maria Lee>, <Person: Daniel Lee>]
+>> Birthplace.objects.all()
+[<Birthplace: Dallas, Texas>, <Birthplace: New York City, New York>]
 
-list_a = [65,41,27]
-for i in range(len(list_a)):
-    print(list_a[i]) # 65,41,27
+>> person = Person.object.get(name="John Smith")
+>> person.birthplace
+<Birthplace: Dallas, Texas>
+>> person.birthplace.city
+Dallas
+
+>> place = Birthplace.objects.get(city="Dallas")
+>> place.person_set.all()
+[<Person: John Smith>, <Person: Maria Lee>]
+
+# One-to-one - two objects to having a unique relationship.     User |--| Profile
+                                                                  ^          ^
+                                                                  |          |
+                                                                 One        One
+class Profile(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL) # Note that Django suggests getting the User from the settings for relationship definitions
+    fruit = models.CharField(max_length=50, help_text="Favorite Fruit")
+    facebook = models.CharField(max_length=100, help_text="Facebook Username")
+
+    def __unicode__(self):
+        return "".join(self.fruit, " ", self.facebook)
+    
+# Many-to-many - Order >--< Project
+                   ^           ^
+                   |           |
+                  Many        Many
+class Order(models.Model):
+    product = models.CharField(max_length=150)  # Note that in reality, this would probably be better served by a Product model
+    customer = models.CharField(max_length=150)  # The same may be said for customers
+
+    def __unicode__(self):
+        return "".join(self.product, " for ", self.customer)
+
+class Project(models.Model):
+    orders = models.ManyToManyField(Order)
+
+    def __unicode__(self):
+        return "".join("Project ", str(self.id))
+    
+>> Project.objects.all()
+[<Project: Project 0>, <Project: Project 1>, <Project: Project 2>]
+>> for proj in Project.objects.all():
+..     print(proj)
+..     proj.orders.all()  # Note that we must access the `orders`
+..                        # field through its manager
+..     print("")
+Project 0
+[]
+Project 1
+[<Order: Spaceship for NASA>]
+Project 2
+[<Order: Spaceship for NASA>, <Order: Race car for NASCAR>]
+
+>> order = Order.objects.filter(customer="NASA")[0]
+>> order.project_set.all()
+[<Project: Project 0>, <Project: Project 2>]
